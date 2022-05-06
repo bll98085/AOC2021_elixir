@@ -5,27 +5,27 @@ defmodule Aoc.Day2 do
     |> Enum.map(&(String.trim(&1, "\r")))
     |> Enum.map(&(String.split(&1, " ")))
     |> Enum.map(&(tostring(&1)))
-    |> Enum.map(&(sort_report(&1)))
-    # |> Enum.map(&sort(&1))
+    |> Enum.map(&(transf_report(&1)))   # [{5, 0}, {0, 5}, {8, 0}, {0, -3}, {0, 8}, {2, 0}]
+    |> Enum.map(&sort(&1))
   end
 
   def tostring([h, t]) do
     [ h, String.to_integer(t) ]
   end
 
-  def sort_report([h,t]) do
+  def transf_report([h,t]) do
     sort_report(h, t, {0, 0})
   end
 
-  def sort_report("forward", t, {hor, dep}) do
+  def transf_report("forward", t, {hor, dep}) do
     {hor+ t, dep}
   end
 
-  def sort_report("down", t, {hor, dep}) do
+  def transf_report("down", t, {hor, dep}) do
     {hor, dep + t}
   end
 
-  def sort_report("up", t, {hor, dep}) do
+  def transf_report("up", t, {hor, dep}) do
     {hor, dep- t}
   end
 
