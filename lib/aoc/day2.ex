@@ -1,12 +1,27 @@
 defmodule Aoc.Day2 do
-  def figure(rep) do
-    rep
-    |> String.split("\n")
-    |> Enum.map(&(String.trim(&1, "\r")))
+  def figure do
+    input_txt
+    |> String.split("\n", trim: true)
+    # |> Enum.map(&(String.trim(&1, "\r")))
     |> Enum.map(&(String.split(&1, " ")))
     |> Enum.map(&(tostring(&1)))
-    |> Enum.map(&(transf_report(&1)))   # [{5, 0}, {0, 5}, {8, 0}, {0, -3}, {0, 8}, {2, 0}]
-    |> Enum.map(&sort(&1))
+    |> Enum.map(&(transf_report(&1)))
+    |> sort
+  end
+
+  def input_txt do
+    Path.expand("../source", __DIR__)
+    |> Path.join("input2.txt")
+    |> File.read
+    |> handle_file
+  end
+
+  def handle_file({:ok, val}) do
+    val
+  end
+
+  def handle_file({:error, reason}) do
+    reason
   end
 
   def tostring([h, t]) do
@@ -14,7 +29,7 @@ defmodule Aoc.Day2 do
   end
 
   def transf_report([h,t]) do
-    sort_report(h, t, {0, 0})
+    transf_report(h, t, {0, 0})
   end
 
   def transf_report("forward", t, {hor, dep}) do
@@ -31,20 +46,28 @@ defmodule Aoc.Day2 do
 
   def sort(val) do
     {h, d} =
-      Enum.reduce(val, {0, 0}, fn{horizontal, depth}, {direction, size} ->
-        case horizontal > depth do
+      Enum.reduce(val, {0, 0}, fn({horizontal, depth}, {direction, height}) ->
+        case horizontal != 0 do
           :true -> direction+ horizontal
-          :false -> size+ depth
-          # :true -> direction + horizontal
-          # :false -> path + depth
+          :false -> height+ depth
         end
     end)
     h * d
+
+#   def sort(val) do
+#     x =
+#       Enum.reduce(val, 0, fn({horizontal, depth}, acc) ->
+#         case horizontal != 0 do
+#           :true -> acc+ horizontal
+#           :false -> acc+ depth
+#         end
+#       end)
+#     x
   end
 end
 
 
-
+# ---- solution 2 ------
 
 # defmodule Aoc.Day2 do
 #   def main(rep) do
@@ -68,19 +91,10 @@ end
 #       end)
 #     x * y
 #   end
-
 # end
 
 
 
 
-report =
-"forward 5
-down 5
-forward 8
-up 3
-down 8
-forward 2"
 
-IO.inspect Aoc.Day2.figure(report)
-# IO.inspect Aoc.Day2.main(report)
+IO.inspect Aoc.Day2.figure
