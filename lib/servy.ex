@@ -1,4 +1,4 @@
-defmodule Servy do
+defmodule Servy.Test do
   def main(rep, acc) do
     rep
     |> String.split("\n")   # ["199", "200", "208", "210", "200", "207", "240", "269", "260", "263"]
@@ -30,5 +30,3 @@ report = "199
 269
 260
 263"
-
-IO.inspect Servy.main(report, 0)

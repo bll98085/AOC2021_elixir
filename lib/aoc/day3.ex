@@ -2,6 +2,7 @@ defmodule Aoc.Day3 do
   def main do
     input()
     |> String.split("\n")
+    # |> Enum.map(&String.trim(&1, "\r"))   # part1 use
     |> Enum.map(&String.split(&1, "", trim: true))
     |> transpose
     |> parse
@@ -27,6 +28,7 @@ defmodule Aoc.Day3 do
   def transpose(row) do
     row
     |> List.zip
+    |> Enum.map(&Tuple.to_list/1)
   end
 
   def parse(split_val) do
@@ -57,5 +59,19 @@ defmodule Aoc.Day3 do
     x * y
   end
 end
+
+part1 =
+"00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010"
 
 IO.inspect Aoc.Day3.main
