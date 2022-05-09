@@ -46,23 +46,13 @@ defmodule Aoc.Day2 do
 
   def sort(val) do
     {h, d} =
-      Enum.reduce(val, {0, 0}, fn({horizontal, depth}, {direction, height}) ->
+      Enum.reduce(val, {0, 0}, fn({horizontal, depth}, {dir, hei}) ->
         case horizontal != 0 do
-          :true -> direction+ horizontal
-          :false -> height+ depth
+          :true -> {dir+ horizontal, hei}
+          :false -> {dir, hei+ depth}
         end
-    end)
+      end)
     h * d
-
-#   def sort(val) do
-#     x =
-#       Enum.reduce(val, 0, fn({horizontal, depth}, acc) ->
-#         case horizontal != 0 do
-#           :true -> acc+ horizontal
-#           :false -> acc+ depth
-#         end
-#       end)
-#     x
   end
 end
 
@@ -92,9 +82,5 @@ end
 #     x * y
 #   end
 # end
-
-
-
-
 
 IO.inspect Aoc.Day2.figure

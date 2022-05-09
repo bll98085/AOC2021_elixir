@@ -2,7 +2,6 @@ defmodule Aoc.Day3 do
   def main do
     input()
     |> String.split("\n")
-    # |> Enum.map(&String.trim(&1, "\r"))
     |> Enum.map(&String.split(&1, "", trim: true))
     |> transpose
     |> parse
@@ -17,32 +16,30 @@ defmodule Aoc.Day3 do
     |> handle_file
   end
 
-  def handle_file(:ok, val) do
+  def handle_file({:ok, val}) do
     val
   end
 
-  def handle_file(:error, reason) do
+  def handle_file({:error, reason}) do
     reason
   end
 
-  def transpose([[] | _]), do: []
-  def transpose(m) do
-    [Enum.map(m, &hd/1) | transpose(Enum.map(m, &tl/1))]
+  def transpose(row) do
+    row
+    |> List.zip
   end
 
   def parse(split_val) do
     split_val
     |> Enum.map(&parse_val(&1))
   end
-
   def parse_val(val) do
     total = Enum.count(val)
     gamma = Enum.count(val, fn x -> x== "1" end)
-    binary =
-      case gamma > total/2 do
-        :true -> 1
-        :false -> 0
-      end
+    case gamma > total/2 do
+      :true -> 1
+      :false -> 0
+    end
   end
 
   def reverse(val) do
@@ -51,8 +48,7 @@ defmodule Aoc.Day3 do
 
   def join(gamma) do
     epsilon = gamma |> Enum.map(&reverse(&1))
-    power = {Enum.join(gamma), Enum.join(epsilon)}
-    # elem(power, 1)
+    {Enum.join(gamma), Enum.join(epsilon)}
   end
 
   def decimal({gam, eps}) do
