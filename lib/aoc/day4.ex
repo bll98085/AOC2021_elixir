@@ -42,19 +42,35 @@ defmodule Aoc.Day4 do
   def bingo_start(mark, board) do
     fin_score =
       Enum.reduce(mark, board, fn(mark_value, b) ->
-
-        if check_board(b), do {:halt, acc}, else: {:cont: fir_map_row(b, mark_value)}
-
+        # first_map_row(b, mark_value)
+        fin_val = filter_board(b)
+        # if blank?(fin_val), do: {:cont, first_map_row(b, mark_value)}, else: {:halt, fin_val}
+        if blank?(fin_val), do: first_map_row(b, mark_value), else: fin_val
       end)
+    parse_score= fin_score |> List.flatten |> Enum.map(&elem(&1, 0))     #[14, 21, 17, 24, 4]
+
+    win_number = Enum.filter(mark, fn x -> Enum.member?(parse_score, x) end)
+    unmark_num = Enum.reject(mark, fn x -> Enum.member?(parse_score, x) end)
+    # 將 tuple 值拯救出來，然後將呼叫值取出我要的，取最後一位在相乘
+
+    # List.last(win_number) * Enum.sum(unmark_num)
+    # IO.inspect {List.last(win_number) , Enum.sum(unmark_num)}
+    IO.inspect Enum.sum(mark)
   end
 
-  def check_board(board) do
-    Enum.map(board,
-      Enum.all?(fn b -> )
-    end)
+  # 原本預計使用 all? 來判斷
+  # def check_board(board) do
+    #   Enum.all?(board, fn({_, y}) -> y!= 0 end)
+    # end
+
+  def blank?([]), do: true
+  def blank?(_), do: false
+
+  def filter_board(b) do
+    for board <- b, Enum.all?(board, fn {_, mark}-> mark == 0 end), do: board
   end
 
-  def fir_map_row(first_map_board, mark_value) do
+  def first_map_row(first_map_board, mark_value) do
     Enum.map(first_map_board,
       fn (map_b) -> sec_map_row(map_b, mark_value)
     end)
@@ -93,9 +109,10 @@ report =
  2  0 12  3  7"
 
 IO.inspect Aoc.Day4.main(report)
+# IO.inspect Aoc.Day4.blank?([])
 
-# input value -> mark_num, board  , 將 board 做 parse 然後排列成每一列和 zip 後的每一列全部放一起
-# call arr of arr 來對輸入狀態調整
+# input value -> mark_num, board, 將 board 做 parse 然後排列成每一列和 zip 後的每一列全部放一起
+# call arr of arr 來對輸入狀態調整, 對每一列的 value check, 如果完成，則中止 reduce
 
 
 
