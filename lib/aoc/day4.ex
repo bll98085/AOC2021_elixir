@@ -49,13 +49,9 @@ defmodule Aoc.Day4 do
       end)
     parse_score= fin_score |> List.flatten |> Enum.map(&elem(&1, 0))     #[14, 21, 17, 24, 4]
 
-    win_number = Enum.filter(mark, fn x -> Enum.member?(parse_score, x) end)
-    unmark_num = Enum.reject(mark, fn x -> Enum.member?(parse_score, x) end)
+    mark_number(mark, parse_score)
     # 將 tuple 值拯救出來，然後將呼叫值取出我要的，取最後一位在相乘
-
-    # List.last(win_number) * Enum.sum(unmark_num)
-    # IO.inspect {List.last(win_number) , Enum.sum(unmark_num)}
-    IO.inspect Enum.sum(mark)
+    # IO.inspect {Enum.sum(mark), Enum.sum(unmark_num), Enum.sum(win_number)}
   end
 
   # 原本預計使用 all? 來判斷
@@ -65,6 +61,21 @@ defmodule Aoc.Day4 do
 
   def blank?([]), do: true
   def blank?(_), do: false
+
+  def mark_number(m, p) do
+    mark_number(m, p, [])
+  end
+
+  def mark_number(_, [], arr), do: arr
+
+  def mark_number([h | t], p, arr) do
+    IO.inspect {p, arr, h}
+    mark_number(t, list_delete(p, h), arr ++ [h])
+  end
+
+  def list_delete(p, h) do
+    List.delete(p, h)
+  end
 
   def filter_board(b) do
     for board <- b, Enum.all?(board, fn {_, mark}-> mark == 0 end), do: board
