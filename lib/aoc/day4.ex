@@ -2,11 +2,11 @@ defmodule Aoc.Day4 do
   def main(rep) do
     [mark_num | table] =
       rep |> String.split("\n\n")
-    # {go_mark(mark_num)}
-    bingo_start(go_mark(mark_num), get_tables(table))
+    bingo_start(parse_mark(mark_num), get_tables(table))
+    # get_tables(table)
   end
 
-  def go_mark(val) do
+  def parse_mark(val) do
     val
     |> String.split(",")
     |> Enum.map(&String.to_integer/1)
@@ -33,25 +33,41 @@ defmodule Aoc.Day4 do
 
   def zip_table(val) do
     val
-    |> Enum.flat_map(fn board ->
+    |> Enum.map(fn board ->
         board ++ (board |> List.zip |> Enum.map(&Tuple.to_list/1))
       end)
-    |> Enum.map(&Enum.with_index(&1, 1))
+    |> Enum.map(&call_index(&1))
   end
+
+  def call_index(b) do
+    b |> Enum.map(&Enum.with_index(&1, 1))
+  end
+
+
+
 
   def bingo_start(mark, board) do
     fin_score =
       Enum.reduce(mark, board, fn(mark_value, b) ->
-        # first_map_row(b, mark_value)
+        # IO.inspect b
         fin_val = filter_board(b)
-        # if blank?(fin_val), do: {:cont, first_map_row(b, mark_value)}, else: {:halt, fin_val}
+      # if blank?(fin_val), do: {:cont, first_map_row(b, mark_value)}, else: {:halt, fin_val}
         if blank?(fin_val), do: first_map_row(b, mark_value), else: fin_val
       end)
-    parse_score= fin_score |> List.flatten |> Enum.map(&elem(&1, 0))     #[14, 21, 17, 24, 4]
 
-    mark_number(mark, parse_score)
+    # parse_score= fin_score |> List.flatten |> Enum.map(&elem(&1, 0))     #[14, 21, 17, 24, 4]
+
+    # Enum.sum(unmark_number(mark, parse_score))
     # 將 tuple 值拯救出來，然後將呼叫值取出我要的，取最後一位在相乘
     # IO.inspect {Enum.sum(mark), Enum.sum(unmark_num), Enum.sum(win_number)}
+  end
+
+  def unmark_number(t, []), do: t
+  def unmark_number([h | t], p) do
+    unmark_number(t, list_delete(p, h))
+  end
+  def list_delete(p, h) do
+    List.delete(p, h)
   end
 
   # 原本預計使用 all? 來判斷
@@ -59,32 +75,13 @@ defmodule Aoc.Day4 do
     #   Enum.all?(board, fn({_, y}) -> y!= 0 end)
     # end
 
-  def blank?([]), do: true
-  def blank?(_), do: false
-
-  def mark_number(m, p) do
-    mark_number(m, p, [])
-  end
-
-  def mark_number(_, [], arr), do: arr
-
-  def mark_number([h | t], p, arr) do
-    IO.inspect {p, arr, h}
-    mark_number(t, list_delete(p, h), arr ++ [h])
-  end
-
-  def list_delete(p, h) do
-    List.delete(p, h)
-  end
-
-  def filter_board(b) do
-    for board <- b, Enum.all?(board, fn {_, mark}-> mark == 0 end), do: board
-  end
-
-  def first_map_row(first_map_board, mark_value) do
-    Enum.map(first_map_board,
+  def first_map_row([], _), do: []
+  def first_map_row([h | t], mark_value) do
+    IO.inspect
+    Enum.map(h,
       fn (map_b) -> sec_map_row(map_b, mark_value)
     end)
+    first_map_row(t, mark_value)
   end
 
   def sec_map_row(row, mark_value) do
@@ -95,6 +92,16 @@ defmodule Aoc.Day4 do
       end
     end)
   end
+
+  def filter_board([]), do: []
+  def filter_board([h |t]) do
+    for board <- h, Enum.all?(board, fn {_, mark}-> mark == 0 end), do: board
+    filter_board(t)
+  end
+
+  def blank?([]), do: true
+  def blank?(_), do: false
+
 
 end
 
