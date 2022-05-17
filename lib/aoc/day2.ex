@@ -1,6 +1,6 @@
 defmodule Aoc.Day2 do
   def figure do
-    input_txt
+    input_txt()
     |> String.split("\n", trim: true)
     # |> Enum.map(&(String.trim(&1, "\r")))
     |> Enum.map(&(String.split(&1, " ")))

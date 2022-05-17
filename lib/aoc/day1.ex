@@ -1,6 +1,6 @@
 defmodule Servy do
   def main do
-    input_txt
+    input_txt()
     |> String.split("\n")
     |> Enum.map(&(String.trim(&1, " ")))
     # |> String.replace("\r", "")
