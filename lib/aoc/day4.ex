@@ -50,13 +50,14 @@ defmodule Aoc.Day4 do
     fin_score =
       Enum.reduce(mark, board, fn(mark_value, all_board) ->
         fin_board = check_bingo(all_board)
-        # IO.inspect fin_board
-        if blank?(fin_board), do: mark_board(all_board, mark_value), else: fin_board
+        IO.inspect fin_board
+        # if blank?(fin_board), do: mark_board(all_board, mark_value), else: fin_board
+        mark_board(all_board, mark_value)
 
         # if check_board = [], do: mark_board(all_board, mark_value), else: check_board
         # if blank?(fin_list), do: mark_board(b, mark_value), else: fin_list
       end)
-
+    fin_score
     # fin_score =
     #   Enum.reduce(mark, board, fn(mark_value, b) ->
     #     # IO.inspect b
@@ -71,16 +72,22 @@ defmodule Aoc.Day4 do
     # 將 tuple 值拯救出來，然後將呼叫值取出我要的，取最後一位在相乘
     # IO.inspect {Enum.sum(mark), Enum.sum(unmark_num), Enum.sum(win_number)}
   end
-
+# divide each board
   def check_bingo(board) do
-    Enum.map(board, fn b -> check_bingo_row(b) end)
-    IO.inspect(board)
+    Enum.map(board, fn b ->
+      if check_bingo_row(b), do: b, else:
+      # case check_bingo_row(b) do
+      #   :true -> {:cont, []}
+      #   :false -> {:halt, b}
+      # end
+    end)
   end
+# divide each row
   def check_bingo_row(board) do
-    Enum.map(board, fn b -> Enum.all?(b, bingo(b)) end)
+    Enum.map(board, fn b -> Enum.any?(b, is_bingo(b)) end)
   end
 
-  def bingo(val) do
+  def is_bingo(val) do
     Enum.all?(val, fn {_, mark}-> mark == 0 end)
   end
 
@@ -137,17 +144,17 @@ report =
  6 10  3 18  5
  1 12 20 15 19
 
- 3 15  0  2 22
- 9 18 13 17  5
-19  8  7 25 23
-20 11 10 24  4
-14 21 16 12  6
 
-14 21 17 24  4
-10 16 15  9 19
-18  8 23 26 20
-22 11 13  6  5
+ 14 21 17 24  4
+ 10 16 15  9 19
+ 18  8 23 26 20
+ 22 11 13  6  5
  2  0 12  3  7"
+#  3 15  0  2 22
+#  9 18 13 17  5
+# 19  8  7 25 23
+# 20 11 10 24  4
+# 14 21 16 12  6
 
 IO.inspect Aoc.Day4.main(report)
 # IO.inspect Aoc.Day4.sec_map_row([{4, 1}, {19, 2}, {20, 3}, {5, 4}, {7, 5}], 7)
