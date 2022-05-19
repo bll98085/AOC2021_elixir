@@ -3,6 +3,7 @@ defmodule Aoc.Day4 do
     [mark_num | table] =
       rep |> String.split("\n\n")
     bingo_start(parse_mark(mark_num), get_tables(table))
+    # {parse_mark(mark_num), get_tables(table)}
     # get_tables(table)
   end
 
@@ -47,13 +48,22 @@ defmodule Aoc.Day4 do
 
 
   def bingo_start(mark, board) do
+
+
     fin_score =
       Enum.reduce(mark, board, fn(mark_value, b) ->
+        # check_func(b)
+        mark_board(b, mark_value)
         # IO.inspect b
-        fin_val = filter_board(b)
-      # if blank?(fin_val), do: {:cont, first_map_row(b, mark_value)}, else: {:halt, fin_val}
-        if blank?(fin_val), do: first_map_row(b, mark_value), else: fin_val
       end)
+
+    # fin_score =
+    #   Enum.reduce(mark, board, fn(mark_value, b) ->
+    #     # IO.inspect b
+    #     fin_val = filter_board(b)
+    #   # if blank?(fin_val), do: {:cont, first_map_row(b, mark_value)}, else: {:halt, fin_val}
+    #     if blank?(fin_val), do: first_map_row(b, mark_value), else: fin_val
+    #   end)
 
     # parse_score= fin_score |> List.flatten |> Enum.map(&elem(&1, 0))     #[14, 21, 17, 24, 4]
 
@@ -75,14 +85,36 @@ defmodule Aoc.Day4 do
     #   Enum.all?(board, fn({_, y}) -> y!= 0 end)
     # end
 
-  def first_map_row([], _), do: []
-  def first_map_row([h | t], mark_value) do
-    IO.inspect
-    Enum.map(h,
-      fn (map_b) -> sec_map_row(map_b, mark_value)
-    end)
-    first_map_row(t, mark_value)
+  # mark
+  # |> map todo board
+  #   {a},{b},{c}
+  #   |> list [h | t, [empty]]
+  #     |> check a,b,c bingo
+  #     h |> each find value value
+  #     everytime concat each board
+
+  def mark_board(board, mark) do
+    mark_board(board, mark, [])
   end
+  def mark_board([], _, b) do
+    IO.inspect b
+    b
+  end
+  def mark_board([h | t], mark, fin_b) do
+    # IO.inspect h
+    table = Enum.map(h, fn row -> sec_map_row(row, mark) end)
+    # IO.inspect table
+    mark_board(t, mark, fin_b ++ [table])
+  end
+
+
+  # def first_map_row([], _), do: []
+  # def first_map_row([h | t], mark_value) do
+  #   Enum.map(h,
+  #     fn (map_b) -> sec_map_row(map_b, mark_value)
+  #   end)
+  #   first_map_row(t, mark_value)
+  # end
 
   def sec_map_row(row, mark_value) do
     Enum.map(row, fn {map_r, is_mark} ->
@@ -127,6 +159,7 @@ report =
  2  0 12  3  7"
 
 IO.inspect Aoc.Day4.main(report)
+# IO.inspect Aoc.Day4.sec_map_row([{4, 1}, {19, 2}, {20, 3}, {5, 4}, {7, 5}], 7)
 
 # IO.inspect Aoc.Day4.blank?([])
 
