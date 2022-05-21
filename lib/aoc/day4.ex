@@ -18,7 +18,6 @@ defmodule Aoc.Day4 do
     |> Enum.map(&get_table/1)
     |> zip_table
   end
-
   defp get_table(board) do
     board
     |> String.replace("  ", " ")
@@ -30,7 +29,6 @@ defmodule Aoc.Day4 do
       |> Enum.map(&String.to_integer/1)
     end)
   end
-
   def zip_table(val) do
     val
     |> Enum.map(fn board ->
@@ -38,7 +36,6 @@ defmodule Aoc.Day4 do
       end)
     |> Enum.map(&call_index(&1))
   end
-
   def call_index(b) do
     b |> Enum.map(&Enum.with_index(&1, 1))
   end
@@ -46,45 +43,51 @@ defmodule Aoc.Day4 do
 
 
 
+
   def bingo_start(mark, board) do
-    fin_score =
-      Enum.reduce(mark, board, fn(mark_value, all_board) ->
+    {fin_board, mark_arr} =
+      Enum.reduce_while(mark, {board, []}, fn(mark_value, {all_board, arr}) ->
         fin_board = check_bingo(all_board)
-        IO.inspect fin_board
-        # if blank?(fin_board), do: mark_board(all_board, mark_value), else: fin_board
-        mark_board(all_board, mark_value)
-
-        # if check_board = [], do: mark_board(all_board, mark_value), else: check_board
-        # if blank?(fin_list), do: mark_board(b, mark_value), else: fin_list
+        # if blank?(List.flatten(fin_board)), do: mark_board(all_board, mark_value), else: fin_board
+        final=
+          case blank?(List.flatten(fin_board)) do
+            :true -> {:cont, {mark_board(all_board, mark_value), arr ++ [mark_value]}}
+            :false -> {:halt, {fin_board, arr + [mark_value]}}
+          end
+        # IO.inspect final
+        # final
       end)
-    fin_score
-    # fin_score =
-    #   Enum.reduce(mark, board, fn(mark_value, b) ->
-    #     # IO.inspect b
-    #     fin_val = check_bingo(b)
-    #   # if blank?(fin_val), do: {:cont, first_map_row(b, mark_value)}, else: {:halt, fin_val}
-    #     if blank?(fin_val), do: first_map_row(b, mark_value), else: fin_val
-    #   end)
-
-    # parse_score= fin_score |> List.flatten |> Enum.map(&elem(&1, 0))     #[14, 21, 17, 24, 4]
+    # List.flatten(fin_score)
+    # call_last_mark(List.flatten(fin_score), mark)
+    # last value * unmarknum
+      {fin_board, mark_arr}
 
     # Enum.sum(unmark_number(mark, parse_score))
     # 將 tuple 值拯救出來，然後將呼叫值取出我要的，取最後一位在相乘
     # IO.inspect {Enum.sum(mark), Enum.sum(unmark_num), Enum.sum(win_number)}
   end
+
+
+  # def call_last_mark(board_arr, mark) do
+  #   markval =
+  #     Enum.reduce(board_arr, mark, fn {board_val, is_mark}, m ->
+  #       case is_mark == 0 do
+  #         :true -> m
+  #         :false -> List.delete(m, board_val)
+  #       end
+  #     end)
+  #   markval
+  # end
+
 # divide each board
   def check_bingo(board) do
     Enum.map(board, fn b ->
-      if check_bingo_row(b), do: b, else:
-      # case check_bingo_row(b) do
-      #   :true -> {:cont, []}
-      #   :false -> {:halt, b}
-      # end
+      if check_bingo_row(b), do: Enum.drop(b, -5), else: []
     end)
   end
 # divide each row
   def check_bingo_row(board) do
-    Enum.map(board, fn b -> Enum.any?(b, is_bingo(b)) end)
+    Enum.any?(board, fn row -> is_bingo(row) end)
   end
 
   def is_bingo(val) do
@@ -144,22 +147,19 @@ report =
  6 10  3 18  5
  1 12 20 15 19
 
+ 3 15  0  2 22
+ 9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6
 
  14 21 17 24  4
  10 16 15  9 19
  18  8 23 26 20
  22 11 13  6  5
  2  0 12  3  7"
-#  3 15  0  2 22
-#  9 18 13 17  5
-# 19  8  7 25 23
-# 20 11 10 24  4
-# 14 21 16 12  6
 
 IO.inspect Aoc.Day4.main(report)
-# IO.inspect Aoc.Day4.sec_map_row([{4, 1}, {19, 2}, {20, 3}, {5, 4}, {7, 5}], 7)
-
-# IO.inspect Aoc.Day4.blank?([])
 
 # input value -> mark_num, board, 將 board 做 parse 然後排列成每一列和 zip 後的每一列全部放一起
 # call arr of arr 來對輸入狀態調整, 對每一列的 value check, 如果完成，則中止 reduce
