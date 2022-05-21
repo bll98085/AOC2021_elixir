@@ -40,44 +40,49 @@ defmodule Aoc.Day4 do
     b |> Enum.map(&Enum.with_index(&1, 1))
   end
 
-
-
-
-
   def bingo_start(mark, board) do
-    {fin_board, mark_arr} =
-      Enum.reduce_while(mark, {board, []}, fn(mark_value, {all_board, arr}) ->
-        fin_board = check_bingo(all_board)
-        # if blank?(List.flatten(fin_board)), do: mark_board(all_board, mark_value), else: fin_board
-        final=
-          case blank?(List.flatten(fin_board)) do
-            :true -> {:cont, {mark_board(all_board, mark_value), arr ++ [mark_value]}}
-            :false -> {:halt, {fin_board, arr + [mark_value]}}
-          end
-        # IO.inspect final
-        # final
-      end)
-    # List.flatten(fin_score)
-    # call_last_mark(List.flatten(fin_score), mark)
-    # last value * unmarknum
-      {fin_board, mark_arr}
+    Enum.reduce_while(mark, board, fn(mark_value, all_board) ->
+      fin_board = check_bingo(all_board)
+      final=
+      case blank?(List.flatten(fin_board)) do
+        :true -> {:cont, mark_board(all_board, mark_value)}
+        :false ->
+          throw({mark_value, fin_board})
+          # {:halt, fin_board}
+      end
+    end)
 
+    # last value * unmarknum
+    catch mark_value -> {end_val, board} = mark_value
+    get_unmark_total(List.flatten(board)) * get_last_mark(mark, end_val)
+    # fin_board
     # Enum.sum(unmark_number(mark, parse_score))
     # 將 tuple 值拯救出來，然後將呼叫值取出我要的，取最後一位在相乘
     # IO.inspect {Enum.sum(mark), Enum.sum(unmark_num), Enum.sum(win_number)}
   end
 
+  def get_unmark_total(board) do
+    get_unmark_total(board, 0)
+  end
+  def get_unmark_total([], acc), do: acc
+  def get_unmark_total([{val, is_mark} | t], acc) do
+    case is_mark == 0 do
+      :true -> get_unmark_total(t, acc)
+      :false -> get_unmark_total(t, acc+ val)
+    end
+  end
 
-  # def call_last_mark(board_arr, mark) do
-  #   markval =
-  #     Enum.reduce(board_arr, mark, fn {board_val, is_mark}, m ->
-  #       case is_mark == 0 do
-  #         :true -> m
-  #         :false -> List.delete(m, board_val)
-  #       end
-  #     end)
-  #   markval
-  # end
+  def get_last_mark(arr, val) do
+    new_list =
+      Enum.reduce_while(arr, [], fn a, new_list ->
+        case a != val do
+          :true -> {:cont, new_list ++ [a]}
+          :false -> {:halt, new_list}
+        end
+      end)
+    List.last(new_list)
+  end
+
 
 # divide each board
   def check_bingo(board) do
@@ -134,8 +139,6 @@ defmodule Aoc.Day4 do
 
   def blank?([]), do: true
   def blank?(_), do: false
-
-
 end
 
 report =
