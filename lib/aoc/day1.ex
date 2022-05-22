@@ -10,7 +10,7 @@ defmodule Servy do
 
   def input_txt do
     Path.expand("../source", __DIR__)
-    |> Path.join("input.txt")
+    |> Path.join("input1.txt")
     |> File.read
     |> handle_file
   end
