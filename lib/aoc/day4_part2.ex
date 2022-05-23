@@ -3,7 +3,7 @@ defmodule Aoc.Day4_part2 do
     [mark_num | table] =
       input_txt()
       |> String.split("\n\n", trim: true)
-      bingo_start(parse_mark(mark_num), List.last(get_tables(table)))
+      bingo_start(parse_mark(mark_num), get_tables(table))
     # {parse_mark(mark_num), get_tables(table)}
     # List.last(get_tables(table))
   end
@@ -56,30 +56,6 @@ defmodule Aoc.Day4_part2 do
     b |> Enum.map(&Enum.with_index(&1, 1))
   end
 
-
-  def get_unmark_total(board) do
-    get_unmark_total(board, 0)
-  end
-  def get_unmark_total([], acc), do: acc
-  def get_unmark_total([{val, is_mark} | t], acc) do
-    case is_mark == 0 do
-      :true -> get_unmark_total(t, acc)
-      :false -> get_unmark_total(t, acc+ val)
-    end
-  end
-
-  def get_last_mark(arr, val) do
-    new_list =
-      Enum.reduce_while(arr, [], fn a, new_list ->
-        case a != val do
-          :true -> {:cont, new_list ++ [a]}
-          :false -> {:halt, new_list}
-        end
-      end)
-    List.last(new_list)
-  end
-
-
   def unmark_number(t, []), do: t
   def unmark_number([h | t], p) do
     unmark_number(t, list_delete(p, h))
@@ -110,11 +86,14 @@ defmodule Aoc.Day4_part2 do
       # Return (index, unmark_board, bingo_arr)
 
       case blank?(all_board) do
-        :true -> mark_board(mark_value, index, all_board, bingo_arr)
-        :false -> {index, all_board, bingo_arr}
+        :true -> throw({mark_value, bingo_arr})
+        :false -> mark_boards(mark_value, index, all_board)
       end
     end)
 
+    catch fin ->
+      {mark_value, [ {_val, bingo_arr} | _]} = fin
+    get_last_mark(mark, mark_value) * get_unmark_total(List.flatten(bingo_arr))
 
     # last value * unmarknum
     # catch mark_value -> {end_val, board} = mark_value
@@ -125,13 +104,52 @@ defmodule Aoc.Day4_part2 do
     # IO.inspect {Enum.sum(mark), Enum.sum(unmark_num), Enum.sum(win_number)}
   end
 
-  def mark_board(mark, index, board, bingo) do
-    newboard = mark_board(mark, board)
-    {index_now, bingo_board} = check_bingo(index, newboard, [])
-    case blank?(bingo_board) do
-      :true -> {index_now, unmark_board(bingo_board, board), [bingo] ++ [bingo_board]}
-      :false -> {index, board, bingo}
+  def get_unmark_total(board) do
+    get_unmark_total(board, 0)
+  end
+  def get_unmark_total([], acc), do: acc
+  def get_unmark_total([{val, is_mark} | t], acc) do
+    case is_mark == 0 do
+      :true -> get_unmark_total(t, acc)
+      :false -> get_unmark_total(t, acc+ val)
     end
+  end
+
+  def get_last_mark(arr, val) do
+    new_list =
+      Enum.reduce_while(arr, [], fn a, new_list ->
+        case a != val do
+          :true -> {:cont, new_list ++ [a]}
+          :false -> {:halt, new_list}
+        end
+      end)
+    List.last(new_list)
+  end
+
+  def mark_boards(mark, index, board) do
+    newboard = mark_board(board, mark)
+    {index_now, unbingo_board, bingo_board} = check_bingo(index, newboard, [], [])
+    {index_now, unbingo_board, bingo_board}
+  end
+
+  def mark_board(board, mark) do
+    mark_board(board, mark, [])
+  end
+  def mark_board([{val, h} | t], mark, fin_b) do
+    table =
+      Enum.map(h, fn row ->
+        sec_map_row(row, mark)
+      end)
+    mark_board(t, mark, fin_b ++ [{val, table}])
+  end
+  def mark_board([], _, fin_b), do: fin_b
+  def sec_map_row(row, mark_value) do
+    Enum.map(row, fn {map_r, is_mark} ->
+      case mark_value == map_r do
+        :true -> {map_r, 0}
+        :false -> {map_r, is_mark}
+      end
+    end)
   end
 
   def unmark_board(bingo, board) do
@@ -140,52 +158,20 @@ defmodule Aoc.Day4_part2 do
     end)
   end
 
-  def check_bingo(index, [], bingo_board), do: {index, bingo_board}
-  def check_bingo(index, [{val, h} | t], bingo_board) do
-    if check_bingo_row(h)
-      do check_bingo(index + 1, t, bingo_board ++ [{index, Enum.drop(h, -5)}])
-    else check_bingo(index, t, bingo_board) end
+  def check_bingo(index, [], unbingo_board, bingo_board), do: {index, unbingo_board, bingo_board}
+  def check_bingo(index, [{_val, h} | t], unbingo_board, bingo_board) do
+    is_bingo = check_bingo_row(h)
+    case is_bingo do
+      :true -> check_bingo(index + 1, t, unbingo_board, bingo_board ++ [{index, Enum.drop(h, -5)}])
+      :false -> check_bingo(index, t, unbingo_board ++ [{0, h}], bingo_board)
+    end
   end
 
-  def check_bingo_row({val, board}) do
+  def check_bingo_row(board) do
     Enum.any?(board, fn row -> is_bingo(row) end)
   end
   def is_bingo(val) do
     Enum.all?(val, fn {_, mark}-> mark == 0 end)
-  end
-
-# {0,
-#  [
-#    [{27, 1}, {18, 2}, {39, 3}, {0, 4}, {48, 5}],
-#    [{84, 1}, {74, 2}, {64, 3}, {80, 4}, {60, 5}],
-#    [{28, 1}, {96, 2}, {37, 3}, {65, 4}, {57, 5}],
-#    [{53, 1}, {79, 2}, {89, 3}, {32, 4}, {14, 5}],
-#    [{55, 1}, {63, 2}, {50, 3}, {7, 4}, {62, 5}],
-#    [{27, 1}, {84, 2}, {28, 3}, {53, 4}, {55, 5}],
-#    [{18, 1}, {74, 2}, {96, 3}, {79, 4}, {63, 5}],
-#    [{39, 1}, {64, 2}, {37, 3}, {89, 4}, {50, 5}],
-#    [{0, 1}, {80, 2}, {65, 3}, {32, 4}, {7, 5}],
-#    [{48, 1}, {60, 2}, {57, 3}, {14, 4}, {62, 5}]
-#  ]
-# }
-
-  def mark_board(board, mark) do
-    mark_board(board, mark, [])
-  end
-  def mark_board([], _, b), do: b
-  def mark_board([{val, h} | t], mark, fin_b) do
-    table = Enum.map(h, fn {row} ->
-      sec_map_row(row, mark)
-    end)
-    mark_board(t, mark, fin_b ++ [{val, table}])
-  end
-  def sec_map_row(row, mark_value) do
-    Enum.map(row, fn {map_r, is_mark} ->
-      case mark_value == map_r do
-        :true -> {map_r, 0}
-        :false -> {map_r, is_mark}
-      end
-    end)
   end
 
   def blank?([]), do: true
