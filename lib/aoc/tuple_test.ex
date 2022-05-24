@@ -14,6 +14,7 @@ defmodule Aoc.Tuple_test do
         {:cont, [element | acc]}
       end
     end
+    foo
   end
 
   def flat(rep) do
@@ -40,8 +41,8 @@ defmodule Aoc.Tuple_test do
   end
 end
 
-input=
-"12345"
+# input=
+# "12345"
 
 report=
 [

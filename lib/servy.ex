@@ -1,9 +1,9 @@
 defmodule Servy.Test do
-  def main(rep, acc) do
-    rep
-    |> String.split("\n")   # ["199", "200", "208", "210", "200", "207", "240", "269", "260", "263"]
-    |> meansure
-  end
+  # def main(rep, acc) do
+  #   rep
+  #   |> String.split("\n")   # ["199", "200", "208", "210", "200", "207", "240", "269", "260", "263"]
+  #   |> meansure
+  # end
 
   def meansure([h | t]) do
     meansure(t, h, 0)
@@ -20,13 +20,13 @@ defmodule Servy.Test do
   def meansure([], _, acc), do: acc
 end
 
-report = "199
-200
-208
-210
-200
-207
-240
-269
-260
-263"
+# report = "199
+# 200
+# 208
+# 210
+# 200
+# 207
+# 240
+# 269
+# 260
+# 263"
