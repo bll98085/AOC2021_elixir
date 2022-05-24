@@ -1,6 +1,22 @@
 defmodule Aoc.Day5 do
   def main(val) do
-    val
+    lines =
+      val
+      |> String.split("\n", trim: true)
+      |> Enum.map(fn x ->
+          x
+          |> String.split(" -> ")
+          |> Enum.map(&String.split(&1, ","))
+          |> Enum.flat_map(fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
+          |> List.to_tuple()
+        end)
+    call_line(lines)
+  end
+
+  def call_line(arr) do
+    Enum.map(arr, fn {x1, x2, y1, y2} ->
+      {x1, x2, y1, y2}
+    end)
   end
 end
 

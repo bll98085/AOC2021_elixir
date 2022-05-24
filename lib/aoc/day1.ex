@@ -1,4 +1,4 @@
-defmodule Servy do
+defmodule Aoc.Day1 do
   def main do
     input_txt()
     |> String.split("\n")
@@ -37,4 +37,4 @@ defmodule Servy do
   def meansure([], _, acc), do: acc
 end
 
-IO.inspect Servy.main
+IO.inspect Aoc.Day1.main
