@@ -4,8 +4,6 @@ defmodule Aoc.Day4_part2 do
       input_txt()
       |> String.split("\n\n", trim: true)
       bingo_start(parse_mark(mark_num), get_tables(table))
-    # {parse_mark(mark_num), get_tables(table)}
-    # List.last(get_tables(table))
   end
 
   def input_txt do
@@ -14,7 +12,6 @@ defmodule Aoc.Day4_part2 do
     |> File.read
     |> handle_file
   end
-
   def handle_file({:ok, content}) do
     content
   end
@@ -81,10 +78,6 @@ defmodule Aoc.Day4_part2 do
 
   def bingo_start(mark, board) do
     Enum.reduce(mark, {1, board, []}, fn(mark_value, {index, all_board, bingo_arr}) ->
-
-      # mark_board(mark, index, board, bingo)
-      # Return (index, unmark_board, bingo_arr)
-
       case blank?(all_board) do
         :true -> throw({mark_value, bingo_arr})
         :false -> mark_boards(mark_value, index, all_board)
@@ -183,9 +176,6 @@ IO.inspect Aoc.Day4_part2.main
 
 # input value -> mark_num, board, 將 board 做 parse 然後排列成每一列和 zip 後的每一列全部放一起
 # call arr of arr 來對輸入狀態調整, 對每一列的 value check, 如果完成，則中止 reduce
-
-
-
 
   # -------- call arr of arr---------------------
 # defmodule DeepMap do
