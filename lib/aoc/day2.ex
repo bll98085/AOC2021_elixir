@@ -1,12 +1,13 @@
 defmodule Aoc.Day2 do
   def figure do
-    input_txt()
-    |> String.split("\n", trim: true)
-    # |> Enum.map(&(String.trim(&1, "\r")))
-    |> Enum.map(&(String.split(&1, " ")))
-    |> Enum.map(&(tostring(&1)))
-    |> Enum.map(&(transf_report(&1)))
-    |> sort
+    {forward, _depth_val, aim} =
+      input_txt()
+      |> String.split("\n", trim: true)
+      # |> Enum.map(&(String.trim(&1, "\r")))
+      |> Enum.map(&(String.split(&1, " ")))
+      |> Enum.map(&(tostring(&1)))
+      |> Enum.reduce({0, 0, 0}, fn distance, depth -> transf_report(distance, depth) end)
+    forward * aim
   end
 
   def input_txt do
@@ -28,34 +29,43 @@ defmodule Aoc.Day2 do
     [ h, String.to_integer(t) ]
   end
 
-  def transf_report([h,t]) do
-    transf_report(h, t, {0, 0})
+  def transf_report([h,t], {fin_distance, fin_dep, aim}) do
+    transf_report(h, t, {fin_distance, fin_dep, aim})
   end
 
-  def transf_report("forward", t, {hor, dep}) do
-    {hor+ t, dep}
+  def transf_report("forward", t, {fin_distance, fin_dep, aim}) do
+    {
+      fin_distance + t,
+      fin_dep,
+      check_multiple(t, fin_dep, aim)
+    }
   end
 
-  def transf_report("down", t, {hor, dep}) do
-    {hor, dep + t}
+  def transf_report("down", t, {fin_distance, fin_dep, aim}) do
+    {fin_distance, fin_dep + t, aim}
   end
 
-  def transf_report("up", t, {hor, dep}) do
-    {hor, dep- t}
+  def transf_report("up", t, {fin_distance, fin_dep, aim}) do
+    {fin_distance, fin_dep- t, aim}
   end
 
-  def sort(val) do
-    {h, d} =
-      Enum.reduce(val, {0, 0}, fn({horizontal, depth}, {dir, hei}) ->
-        case horizontal != 0 do
-          :true -> {dir+ horizontal, hei}
-          :false -> {dir, hei+ depth}
-        end
-      end)
-    h * d
+  def check_multiple(now_val, depth, aim) do
+    if(depth != 0) do
+      (now_val * depth) + aim
+    else
+      aim
+    end
   end
 end
 
+
+# foo =
+# "forward 5
+# down 5
+# forward 8
+# up 3
+# down 8
+# forward 2"
 
 # ---- solution 2 ------
 
@@ -70,13 +80,13 @@ end
 
 #   def parse(rep) do
 #     {x, y} =
-#       Enum.reduce( rep, {0, 0}, fn[direction, size], {horizontal, depth} ->
+#       Enum.reduce( rep, {0, 0}, fn[direction, size], {aimizontal, depth} ->
 #         size = String.to_integer(size)
 
 #         case direction do
-#           "forward" -> {horizontal + size, depth}
-#           "down" -> {horizontal, depth + size}
-#           "up" -> {horizontal, depth - size}
+#           "forward" -> {aimizontal + size, depth}
+#           "down" -> {aimizontal, depth + size}
+#           "up" -> {aimizontal, depth - size}
 #         end
 #       end)
 #     x * y

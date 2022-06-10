@@ -168,7 +168,7 @@ end
 #  22 11 13  6  5
 #  2  0 12  3  7"
 
-IO.inspect Aoc.Day4.main
+# IO.inspect Aoc.Day4.main
 
 # input value -> mark_num, board, 將 board 做 parse 然後排列成每一列和 zip 後的每一列全部放一起
 # call arr of arr 來對輸入狀態調整, 對每一列的 value check, 如果完成，則中止 reduce

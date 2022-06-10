@@ -2,9 +2,8 @@ defmodule Aoc.Day1 do
   def main do
     input_txt()
     |> String.split("\n", trim: true)
-    # |> Enum.map(&(String.trim(&1, " ")))
-    # |> String.replace("\r", "")
     |> Enum.map(&(String.to_integer(&1)))  # 算次數，不用轉 integer
+    |> call_chunk
     |> meansure
   end
 
@@ -13,6 +12,14 @@ defmodule Aoc.Day1 do
     |> Path.join("input1.txt")
     |> File.read
     |> handle_file
+  end
+
+  def call_chunk(arr) do
+    chunk_list =
+      arr
+      |> Enum.chunk_every(3, 1)
+      |> Enum.map(&Enum.sum/1)
+    chunk_list ++ [List.last(arr)]
   end
 
   def handle_file({:ok, content}) do
