@@ -1,22 +1,37 @@
 defmodule Aoc.Day5 do
-  def main(val) do
-    lines =
-      val
-      |> String.split("\n", trim: true)
-      |> Enum.map(fn x ->
-          x
-          |> String.split(" -> ")
-          |> Enum.map(&String.split(&1, ","))
-          |> Enum.flat_map(fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
-          |> List.to_tuple()
-        end)
-    call_line(lines)
+  def main do
+    input()
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn x ->
+      x
+      |> String.split(" -> ")
+      |> Enum.map(&String.split(&1, ","))
+      |> Enum.flat_map(fn x -> Enum.map(x, fn y -> String.  to_integer(y) end) end)
+        |> List.to_tuple()
+      end)
+    |> Enum.flat_map(&call_line/1)
+    |> Enum.frequencies()
+    |> Enum.count(&elem(&1, 1) > 1)
   end
 
-  def call_line(arr) do
-    Enum.map(arr, fn {x1, x2, y1, y2} ->
-      {x1, x2, y1, y2}
-    end)
+  def input do
+    Path.expand("../source", __DIR__)
+    |> Path.join("input5.txt")
+    |> File.read
+    |> handle_file
+  end
+  def handle_file({:ok, content}) do
+    content
+  end
+  def handle_file({:error, reason}) do
+    reason
+  end
+  def call_line({x1, y1, x2, y2}) do
+    cond do
+      x1 == x2 -> for y <- y1..y2, do: {x1 , y}
+      y1 == y2 -> for x <- x1..x2, do: {x , y1}
+      true -> []
+    end
   end
 end
 
@@ -32,4 +47,4 @@ end
 # 0,0 -> 8,8
 # 5,5 -> 8,2"
 
-# IO.inspect Aoc.Day5.main(input)
+IO.inspect Aoc.Day5.main
