@@ -1,21 +1,13 @@
 defmodule Aoc.Day3Part2 do
-  def main(val) do
+  def main do
     parse_list =
-      # input_txt()
-      val
-      |> String.split("\r\n", trim: true)
+      input_txt()
+      |> String.split("\n", trim: true)
       # |> String.split("\n", trim: true)
       |> Enum.map(&String.split(&1, "", trim: true))
-      |> List.delete_at(-1)
+      # |> List.delete_at(-1)
 
-    {oxygen, co2} =
-      parse_list
-        |> transpose
-        |> parse
-        |> join
-
-    {decimal(parse_list, oxygen), decimal(parse_list, co2)}    # 1 作為 index 讓每次 filter 都能抓到
-    # decimal(parse_list, oxygen) * decimal(parse_list, co2)    # 1 作為 index 讓每次 filter 都能抓到
+    elem(Integer.parse(parse(parse_list), 2), 0) * elem(Integer.parse(co2_parse(parse_list), 2), 0)
   end
 
   def input_txt do
@@ -38,51 +30,47 @@ defmodule Aoc.Day3Part2 do
     |> Enum.map(&Tuple.to_list/1)
   end
 
-  def parse(split_val) do
-    split_val
-    |> Enum.map(&parse_val(&1))
+  def parse(list) do
+    parse(list, 0)
+  end
+  def parse(split_val, index) do
+    if length(split_val) != 1 do
+      each_parse = transpose(split_val)
+      filter_num = parse_val(Enum.at(each_parse, index))
+      sort_list = Enum.filter(split_val, fn val -> Enum.at(val, index) == filter_num end)
+      parse(sort_list, index + 1)
+    else
+      Enum.join(split_val)
+    end
   end
   def parse_val(val) do
-    total = Enum.count(val)
+    total = length(val) / 2
     gamma = Enum.count(val, fn x -> x == "1" end)
-    if gamma > total/2 do "1"
+
+    if gamma >= total do "1"
     else "0"
     end
   end
 
-  def reverse(val) do
-    if val == "0", do: "1", else: "0"
+  def co2_parse(list) do
+    co2_parse(list, 0)
   end
-
-  def join(gamma) do
-    epsilon = gamma |> Enum.map(&reverse(&1))
-    {gamma, epsilon}
+  def co2_parse(split_val, index) do
+    if length(split_val) != 1 do
+      each_parse = transpose(split_val)
+      filter_num = co2_parse_val(Enum.at(each_parse, index))
+      sort_list = Enum.filter(split_val, fn val -> Enum.at(val, index) == filter_num end)
+      co2_parse(sort_list, index + 1)
+    else
+      Enum.join(split_val)
+    end
   end
+  def co2_parse_val(val) do
+    total = length(val) / 2
+    gamma = Enum.count(val, fn x -> x == "0" end)
 
-  # def decimal(sort_list, generator_rating) do
-  # #   {val, _} =
-  # #     parse_val
-  # #     |> Enum.join
-  # #     |> Integer.parse(2)
-  # #   val
-  # end
-
-  def decimal(sort_list, generator_rating) do
-    decimal(sort_list,generator_rating, 0)
-  end
-
-  def decimal(sort_list, [], _), do: sort_list
-  def decimal(sort_list, [h | t], index) do
-    filter_list = Enum.filter(sort_list, fn row -> Enum.at(row, index) == h end)
-    # IO.inspect {sort_list, index}
-    if (length(filter_list)) == 1 do
-      # {val, _} =
-        filter_list
-      #   |> Enum.join
-      #   |> Integer.parse(2)
-      # val
-      else
-      decimal(filter_list, t, index + 1)
+    if gamma > total do "1"
+    else "0"
     end
   end
 
@@ -119,18 +107,18 @@ defmodule Aoc.Day3Part2 do
   # end
 end
 
-input = "00100
-11110
-10110
-10111
-10101
-01111
-00111
-11100
-10000
-11001
-00010
-01010"
+# input = "00100
+# 11110
+# 10110
+# 10111
+# 10101
+# 01111
+# 00111
+# 11100
+# 10000
+# 11001
+# 00010
+# 01010"
 
 # IO.inspect Aoc.Day3.main(report) #part 1
-IO.inspect Aoc.Day3Part2.main(input)
+IO.inspect Aoc.Day3Part2.main
