@@ -1,4 +1,4 @@
-defmodule Aoc.Day1_part2 do
+defmodule Aoc.Day1Part2 do
   def main do
     input_txt()
     |> String.split("\n", trim: true)
@@ -43,4 +43,5 @@ defmodule Aoc.Day1_part2 do
   end
 end
 
-IO.inspect Aoc.Day1_part2.main
+
+IO.inspect Aoc.Day1Part2.main
